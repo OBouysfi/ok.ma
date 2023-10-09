@@ -9,7 +9,5 @@ Site des annonces en Maroc
 
 ![Admin Panel -](https://github.com/OBouysfi/ok.ma/assets/89135146/4bcbf0c8-0f5d-4ab6-a338-9c802ed64870)
 
-![Admin Panel](https://github.com/OBouysfi/ok.ma/assets/89135146/11f0ee9f-f4d5-4151-b82d-c5393c530e62)
-
 ![Login](https://github.com/OBouysfi/ok.ma/assets/89135146/dd6c7c94-73c8-44d1-aedc-deabed4979fe)
 
