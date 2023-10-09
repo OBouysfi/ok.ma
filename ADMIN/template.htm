@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+<meta charset="utf-8">
+<title>Jobs Portal Administration Panel</title>
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="css/users.css"/>
+<link rel="stylesheet" href="css/main.css"/>
+<link href="css/bootstrap.css" rel="stylesheet">
+<link href="css/layout.css" rel="stylesheet">
+<link href="font-awesome-4.1.0/css/font-awesome.min.css" rel="stylesheet" type="text/css">
+
+<script type="text/javascript" src="js/context_menu.js"></script>
+
+
+<!-- HTML5 Shim and Respond.js IE8 support of HTML5 elements and media queries -->
+<!-- WARNING: Respond.js doesn't work if you view the page via file:// -->
+<!--[if lt IE 9]>
+	<script src="https://oss.maxcdn.com/libs/html5shiv/3.7.0/html5shiv.js"></script>
+	<script src="https://oss.maxcdn.com/libs/respond.js/1.4.2/respond.min.js"></script>
+<![endif]-->
+<script>
+block_ajax=false;
+</script>
+<script src="js/jquery-1.11.0.js"></script>
+</head>
+
+<body onload="PageLoaded()">
+
+    <div id="wrapper">
+
+        <!-- Navigation -->
+        <nav id="side_nav" class="navbar navbar-default navbar-static-top top-bar" role="navigation" style="margin-bottom: 0;">
+            <div class="navbar-header">
+                <button id="main_nav_button" type="button" class="navbar-toggle" data-toggle="collapse" data-target=".navbar-collapse">
+                    <span class="sr-only">Toggle navigation</span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                    <span class="icon-bar"></span>
+                </button>
+                <a class="navbar-brand white-link" href="index.php" ><h4 class="no-top-margin">Jobs Portal</h4></a>
+				<img id="loading" class="loading-image lfloat" src="images/loading.gif" width="120" alt="loading" />
+			
+            </div>
+            <!-- /.navbar-header -->
+
+            <ul class="nav navbar-top-links navbar-right hide-sm">
+			
+				<admin top_bar_links/>
+            </ul>
+            <!-- /.navbar-top-links -->
+
+            <div id="main_navigation" class="navbar-default sidebar" role="navigation">
+               
+				<div class="sidebar-nav navbar-collapse">
+                    <ul class="nav" id="side-menu">
+					
+                       <admin menu/>
+                    </ul>
+                </div>
+               
+            </div>
+           
+        </nav>
+
+        <!-- Page Content -->
+        <div id="page-wrapper">
+            <div class="row">
+				<div class="col-lg-12" id="main-content">
+				<!--main content area-->
+			
+                <admin content/>
+               
+			   <!--end main content area-->
+				</div>
+            </div>
+           
+        </div>
+        
+    </div>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/plugins/metisMenu/metisMenu.min.js"></script>
+<script src="js/admin.js"></script>
+<div id="ContextMenuContainer"></div>
+<iframe id="ajax-ifr" name="ajax-ifr" src="include/empty-page.php" style="position:absolute;top:0px;left:0px;visibility:hidden" width="1" height="1"> </iframe>
+</body>
+</html>

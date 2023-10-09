@@ -1,0 +1,53 @@
+RewriteEngine On
+
+
+RewriteRule ^([^/\.]+).atom$ atom.php?type=$1 [L]
+RewriteRule ^([^/\.]+).rss$ rss.php?type=$1 [L]
+
+RewriteRule ^news-([0-9]+)-.*$ index.php?mod=news&id=$1&lang=en [L]
+RewriteRule ^noticia-([0-9]+)-.*$ index.php?mod=news&id=$1&lang=es [L]
+
+RewriteRule ^location-([^0-9]+)-([0-9\-]+).html$ index.php?lang=en&mod=search&location=$2 [L]
+RewriteRule ^ubicacion-([^0-9]+)-([0-9\-]+).html$ index.php?lang=es&mod=search&location=$2 [L]
+
+RewriteRule ^category-([^0-9]+)-([0-9\-]+).html$ index.php?lang=en&mod=search&category=$2 [L]
+RewriteRule ^categoria-([^0-9]+)-([0-9\-]+).html$ index.php?lang=es&mod=search&category=$2 [L]
+
+RewriteRule ^reviews-([^0-9]+)-([0-9\-]+).html$ index.php?lang=en&mod=reviews&id=$2 [L]
+RewriteRule ^opiniones-([^0-9]+)-([0-9\-]+).html$ index.php?lang=es&mod=reviews&id=$2 [L]
+
+RewriteRule ^jobs-([^0-9]+)-([0-9\-]+).html$ index.php?lang=en&mod=search&company=$2 [L]
+RewriteRule ^anuncios-([^0-9]+)-([0-9\-]+).html$ index.php?lang=es&mod=search&company=$2 [L]
+
+RewriteRule ^courses-([^0-9]+)-([0-9\-]+).html$ index.php?lang=en&mod=courses&category=$2 [L]
+RewriteRule ^cursos-([^0-9]+)-([0-9\-]+).html$ index.php?lang=es&mod=courses&category=$2 [L]
+
+RewriteRule ^course-([a-z0-9\-]+)-([0-9\-]+).html$ index.php?mod=course_details&lang=en&id=$2 [L]
+RewriteRule ^curso-([a-z0-9\-]+)-([0-9\-]+).html$ index.php?mod=course_details&lang=es&id=$2 [L]
+
+RewriteRule ^company-([a-z0-9\-]+)-([0-9\-]+).html$ index.php?mod=company&lang=en&id=$2 [L]
+RewriteRule ^empresa-([a-z0-9\-]+)-([0-9\-]+).html$ index.php?mod=company&lang=es&id=$2 [L]
+
+RewriteRule ^job-([a-z0-9\-]+)-([0-9\-]+).html$ index.php?mod=details&lang=en&id=$2 [L]
+RewriteRule ^anuncio-([a-z0-9\-]+)-([0-9\-]+).html$ index.php?mod=details&lang=es&id=$2 [L]
+
+RewriteRule ^fjob-([a-z0-9]+)-([a-z0-9\-]+).html$ index.php?mod=feed_details&lang=en&id=$1 [L]
+RewriteRule ^fanuncio-([a-z0-9]+)-([a-z0-9\-]+).html$ index.php?mod=feed_details&lang=es&id=$1 [L]
+
+RewriteRule ^mod-([a-z]{2})-latest-jobs.html$ index.php?lang=$1&mod=search&latest=1 [L]
+RewriteRule ^mod-latest-jobs.html$ index.php?mod=search&latest=1 [L]
+
+RewriteRule ^mod-([a-z]{2})-featured-jobs.html$ index.php?lang=$1&mod=search&featured=1 [L]
+RewriteRule ^mod-featured-jobs.html$ index.php?mod=search&featured=1 [L]
+
+RewriteRule ^mod-([a-z]{2})-([^/\.]+).html$ index.php?lang=$1&mod=$2 [L]
+RewriteRule ^mod-([^/\.]+).html$ index.php?mod=$1 [L]
+
+RewriteRule ^([^/\.]+).html$ index.php?page=$1 [L]
+
+# php -- BEGIN cPanel-generated handler, do not edit
+# Set the “ea-php54” package as the default “PHP” programming language.
+<IfModule mime_module>
+  AddHandler application/x-httpd-ea-php54 .php .php5 .phtml
+</IfModule>
+# php -- END cPanel-generated handler, do not edit

@@ -1,0 +1,380 @@
+<?php
+if(!defined('IN_SCRIPT')) die("");
+if(!isset($_REQUEST["id"]))
+{
+	die("The job ID isn't set");
+}
+$job=$_REQUEST["id"];
+$website->ms_i($job);
+
+
+$arrPosting = $database->DataArray("jobs","id=".$job);
+$arrEmployer = $database->DataArray("employers","username='".$arrPosting["employer"]."' ");
+
+
+$jobseeker_username="";
+if(isset($_COOKIE["AuthJ"]))
+{
+	$cookie_items=explode("~",$_COOKIE["AuthJ"]);
+	$jobseeker_username=$cookie_items[0];
+}
+
+$database->SQLInsert("jobs_stat", array("date","posting_id","ip","user"), array(time(), $job, $_SERVER["REMOTE_ADDR"],$jobseeker_username));
+
+
+$strLink = "http://".$DOMAIN_NAME."/".$website->job_link($arrPosting["id"],$arrPosting["title"]);
+	
+?>
+<div class="page-wrap">
+
+	<div class="clearfix"></div>
+	<div class="job-details-wrap">
+	<?php
+		
+		if(get_param("ProceedSendFriend") != "" && get_param("email_address") != "")
+		{
+			if($website->GetParam("USE_CAPTCHA_IMAGES") && ( (md5($_POST['code']) != $_SESSION['code'])|| trim($_POST['code']) == "" ) )
+			{
+				echo "
+				<br/>
+					<h3>
+						".$M_WRONG_CODE."
+						<br/><br/>
+					</h3>";
+			}
+			else
+			{
+				$headers  = "From: \"".$website->GetParam("SYSTEM_EMAIL_FROM")."\"<".$website->GetParam("SYSTEM_EMAIL_ADDRESS").">\n";
+						
+				$message= get_param("sender_name") ." ".$RECOMMENDS_FOLLOWING.":\n".
+				$strLink;
+				
+				mail(get_param("email_address"), $JO_RECOMENDED_BY." ".get_param("sender_name"), $message, $headers);
+				
+				echo "
+				<br/>
+				<h3>
+				".$JO_SENT_SUCCESS.": ".get_param("email_address")."
+				</h3>
+				<br/>";	
+			}
+		
+		}
+			
+			
+	?>
+		 
+	<h2 class="no-margin"><?php echo stripslashes(strip_tags($arrPosting["title"]));?></h2>
+
+	<div class="job-details-info">
+		<div class="row">
+			<div class="col-md-6 col-xs-12">
+				<i class="fa fa-clock-o"></i>&nbsp;&nbsp;&nbsp;
+				<?php 
+				$mois_fr = ['', 'Jan', 'Fév', 'Mar', 'Avr', 'Mai', 'Jun', 'Jul', 'Aoû', 'Sep', 'Oct', 'Nov', 'Déc']; 
+				$dattimestape=$arrPosting["date"];
+				$jourDate=date('d', $dattimestape);
+				$moisDate=intval(date('m', $dattimestape));
+				$anneeDate=date('Y', $dattimestape);
+				$heure=date('H', $dattimestape);
+				$minute=date('i', $dattimestape);
+				if ($jourDate==date('d') && $moisDate==date('m') && $anneeDate==date('Y')){
+					echo "Aujourd'hui à ".$heure.':'.$minute;
+				}
+				elseif ($jourDate==date('d')-1 && $moisDate==date('m') && $anneeDate==date('Y')){
+					echo "Hier à ".$heure.':'.$minute;
+				}
+				else{
+					echo 'le : '.$jourDate.' '.$mois_fr[$moisDate].' '.$anneeDate;
+					echo ' à '.$heure.':'.$minute;
+					// echo date($website->GetParam("DATE_HOUR_FORMAT"),$arrPosting["date"]);
+				}
+				// echo "<strong>".$arrPosting["applications"]."</strong> ".$M_APPLICATIONS;
+				?>
+			</div>
+			<div class="col-md-6 col-xs-12">
+			<?php 
+				if(trim($arrPosting["region"])!="")
+				{
+					$str_job_location=$website->show_full_location(strip_tags($arrPosting["region"]));
+					
+					if($str_job_location!="")
+					{
+						echo '<i class="fa fa-map-marker"></i>&nbsp;&nbsp;&nbsp;&nbsp;'.$str_job_location;
+					}
+				}
+				?>	
+			</div>
+			<div class="col-md-6 col-xs-12">
+				<i class="fa fa-briefcase"></i>&nbsp;&nbsp;&nbsp;<?php echo $website->job_type($arrPosting["job_type"]);?>
+			</div>
+			<div class="col-md-6 col-xs-12">
+				<i class="fa fa-money"></i>&nbsp;&nbsp;&nbsp; <?php echo $M_SALARY;?>: <?php echo ((trim($arrPosting["salary"])!=""&&$arrPosting["salary"]!="0" )?$arrPosting["salary"]:" A discuter");?>
+			</div>
+			<?php
+			if(trim($arrPosting["date_available"])!="")
+			{
+			?>
+				<div class="col-md-6 col-xs-12">
+					<i class="fa fa-calendar"></i>&nbsp;&nbsp;&nbsp;&nbsp;<?php echo $M_DATE_AVAILABLE;?>: <strong><?php echo strip_tags(stripslashes(trim($arrPosting["date_available"])!=""?$arrPosting["date_available"]:"[n/a]"));?></strong>
+				</div>
+			<?php
+			}
+			?>	
+			
+		</div>
+	</div>
+	<div class="row">
+		<div class="col-md-9 col-xs-12 job-description">
+		<?php
+			
+			$arrPosting["message"]=str_replace("&lt;!--","<!--",$arrPosting["message"]);
+			$arrPosting["message"]=str_replace("--&gt;","-->",$arrPosting["message"]);
+			echo "<br/>";	
+			echo stripslashes(strip_tags($arrPosting["message"],'<a><br><b><li><ul><span><div><p><font><strong><i><u><table><tr><td>')); 
+
+
+			if(trim($arrPosting["more_fields"]) != "")
+			{
+				$arrJobFields = array();
+
+				if(is_array(unserialize($arrPosting["more_fields"])))
+				{
+					$arrJobFields = unserialize($arrPosting["more_fields"]);
+				}
+
+				$bFirst = true;
+				while (list($key, $val) = each($arrJobFields)) 
+				{
+					echo "<br/>";
+					echo "<b>";
+					echo $key;
+					echo ":</b>"; 
+					echo "<br/> ";
+					echo strip_tags($val);
+				}
+			}
+			
+				?>
+		</div>
+		<div class="col-md-3 col-xs-12" style="margin-top:20px">
+			<form action="index.php" method="post" >
+				<input type="hidden" name="mod" value="apply"/>
+				<input type="hidden" name="posting_id" value="<?php echo $arrPosting["id"];?>"/>
+				<?php
+				if($MULTI_LANGUAGE_SITE)
+				{
+				?>
+				<input type="hidden" name="lang" value="<?php echo $website->lang;?>"/>
+				<?php
+				}
+				?>
+				<input type="submit" class="btn btn-default pull-right custom-gradient btn-green" value=" <?php echo $APPLY_THIS_JOB_OFFER;?> ">
+			</form>
+		</div>
+		<div class="col-md-6">
+			<?php /*<a href="<?php echo $website->company_link($arrEmployer["id"],$arrEmployer["company"]);?>"> 
+			<?php	
+			if($arrEmployer["logo"]!=""&&file_exists('thumbnails/'.$arrEmployer["logo"].'.jpg'))
+			{
+				echo '<img class="logo-border img-responsive" src="thumbnails/'.$arrEmployer["logo"].'.jpg" alt="'.$arrEmployer["company"].'"/>';
+			}
+			elseif($arrEmployer["logo"]!=""&&strpos($arrEmployer["logo"], "http"))
+			{
+				echo '<img class="img-responsive logo-results" src="'.$arrEmployer["logo"].'" alt="'.$arrEmployer["company"].'"/>';
+			}
+			else
+			{
+				echo '<div class="company-wrap">'.$arrEmployer["company"].'</div>';
+			}
+			?>
+			</a>*/ ?>
+			<div class="clearfix underline-link" style="margin-top:10px"></div>
+			<a href="<?php echo $website->company_jobs_link($arrEmployer["id"],$arrEmployer["company"]);?>" class="underline-link small-link"><?php echo "Autres offres du recruteur";?></a>
+			<br/>
+		</div>
+	</div>
+	
+		<div class="clearfix"></div>
+	
+	 
+		<br/>
+		
+		<!--<div class="pull-right"> </div>-->
+		<script>
+
+			function CheckValidEmail(strEmail) 
+			{
+					if (strEmail.search(/^\w+((-\w+)|(\.\w+))*\@[A-Za-z0-9]+((\.|-)[A-Za-z0-9]+)*\.[A-Za-z0-9]+$/) != -1)
+					{
+						return true;
+					}
+					else
+					{
+						return false;
+					}
+			}
+			
+
+			function ValidateSendForm(x)
+			{
+			
+				if(x.sender_name.value==""){
+					alert("<?php echo $PLEASE_ENTER_YOUR_NAME;?>");
+					x.sender_name.focus();
+					return false;
+				}	
+				
+				if(x.email_address.value==""){
+					alert("<?php echo $PLEASE_ENTER_YOUR_FRIENDS_EMAIL;?>");
+					x.email_address.focus();
+					return false;
+				}	
+				
+				if(!CheckValidEmail(x.email_address.value) )
+				{
+					alert(x.email_address.value+" <?php echo $IS_NOT_VALID;?>");
+					x.email_address.focus();
+					return false;
+				}
+				
+				
+				return true;
+			}
+	</script>	
+
+	
+	<!-- <img src="images/save-small-icon.png" height="12"/> -->
+	<?php
+	if(isset($_REQUEST["is_saved_page"]))
+	{
+		echo '<a class="small-link gray-link" href="javascript:DeleteSavedListing('.$arrPosting["id"].')" id="save_'.$arrPosting["id"].'"><img height="16" src="images/star-a.png" alt="'.$M_DELETE.'"/> '.$M_DELETE.'</a>';
+	}
+	else
+	if(isset($_COOKIE["saved_listings"]) && strpos($_COOKIE["saved_listings"], $arrPosting["id"].",") !== false)
+	{
+
+		echo '<img height="16" src="images/star-a.png" alt="'.$M_SAVED.'"/> '.$M_SAVED;
+
+	}
+	else
+	{
+	
+		echo '<a class="small-link gray-link" href="javascript:SaveListing('.$arrPosting["id"].')" id="save_'.$arrPosting["id"].'"><img height="16" src="images/star-d.png" alt="'.$M_SAVE_JOB.'"/> '.$M_SAVE_JOB.'</a>';
+
+	}
+	?>
+	<br/>
+	<div class="clearfix underline-link" style="margin-top:4px"></div>
+	<img src="images/email-small-icon.png"/>
+	<a  href="#" class="small-link gray-link" data-toggle="collapse" data-target=".email-collapse"><?php echo $M_EMAIL_JOB;?></a>
+	
+	
+	<div class="clearfix"></div>
+	<div class="collapse email-collapse text-left">
+		<div class="container">		
+		<!--email job form-->
+			<form action="index.php"  style="margin-top:0px;margin-bottom:0px" method="post" onsubmit="return ValidateSendForm(this)">
+				<input type="hidden" name="mod" value="details"/>
+				<input type="hidden" name="ProceedSendFriend" value="1"/>
+				<input type="hidden" name="id" value="<?php echo $arrPosting["id"];?>"/>
+				<?php
+				if($MULTI_LANGUAGE_SITE)
+				{
+				?>
+				<input type="hidden" name="lang" value="<?php echo $website->lang;?>"/>
+				<?php
+				}
+				?>
+								
+							
+				<b><?php echo $SEND_OFFER_FRIEND;?></b>
+				<br/><br/>
+				<?php echo $EMAIL_SEND_FRIEND;?>:
+				<br/>
+				<input type="text" name="email_address" class="text" class="200px-field">
+				<br/><br/>
+				<?php echo $M_YOUR_NAME;?>:
+				<br/>
+				<input type="text" name="sender_name" class="text" class="200px-field">
+				
+				<br/><br/><br/>
+				<?php
+				if($website->GetParam("USE_CAPTCHA_IMAGES"))
+				{
+				?>
+								
+							
+					<img src="include/sec_image.php" width="150" height="30" />
+				
+				
+					<?php echo $M_CODE;?>:
+				
+					<input type="text" name="code" value="" size="8"/>
+					
+								
+					<br/><br/>
+					
+				<?php
+				}
+				?>		
+						
+				<input type="submit" class="btn custom-gradient btn-green" value=" <?php echo $M_SEND;?> ">
+			</form>
+			<!--email job form-->
+			<br/>
+	
+		</div>	
+	</div>
+	
+	<div class="clearfix"></div>
+
+	<br clear="all"/>
+	<div class="row">
+		<div class="col-xs-8">
+			<a rel="nofollow" href="https://www.linkedin.com/shareArticle?mini=true&title=<?php echo urlencode(strip_tags(stripslashes(strip_tags($arrPosting["title"]))));?>&url=<?php echo $strLink;?>" target="_blank"><img src="images/linkedin.gif" width="18" height="18" class="" alt=""/></a>
+			<a rel="nofollow" href="http://plus.google.com/share?url=<?php echo $strLink;?>" target="_blank"><img src="images/googleplus.gif" width="18" height="18" class="r-margin-7" alt=""/></a>
+			<a rel="nofollow" href="http://www.twitter.com/intent/tweet?text=<?php echo urlencode(strip_tags(stripslashes(strip_tags($arrPosting["title"]))));?>&url=<?php echo $strLink;?>" target="_blank"><img src="images/twitter.gif" width="18" height="18" class=" r-margin-7" alt=""/></a>
+			<a rel="nofollow" href="http://www.facebook.com/sharer.php?u=<?php echo $strLink;?>" target="_blank"><img src="images/facebook.gif" width="18" height="18" alt="" class="r-margin-7"/></a>
+		</div>
+		<div class="col-xs-4">
+		<a id="go_back_button" class="btn btn-default btn-xs pull-right no-decoration margin-bottom-5" href="javascript:GoBack()"><?php echo $M_GO_BACK;?></a>
+		</div>
+	</div>
+
+	
+</div>
+	
+</div>
+
+<?php
+$website->Title(strip_tags(stripslashes($arrPosting["title"])));
+$website->MetaDescription(text_words(strip_tags(stripslashes($arrPosting["message"])),30));
+$website->MetaKeywords(text_words(strip_tags(stripslashes($arrPosting["message"])),20));
+
+
+if($website->multi_language)
+{
+	
+	foreach($website->languages as $language)
+	{
+		if($language==$website->lang) continue;
+		
+		if(file_exists("include/texts_".$language.".php"))
+		{
+			include("include/texts_".$language.".php");
+		}
+		
+		$str_job_lang_link=$website->job_link($arrPosting["id"],$arrPosting["title"],$language,$M_SEO_JOB);
+		
+		$website->TemplateHTML = 
+		str_replace
+		(
+			'"index.php?lang='.$language.'"',
+			$str_job_lang_link,
+			$website->TemplateHTML
+		);
+	}
+	include("include/texts_".$website->lang.".php");
+}
+?>
